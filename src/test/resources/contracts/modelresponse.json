@@ -1,0 +1,8 @@
+{
+  "responseCode": "200",
+  "responseDescription": "SUCCESS",
+  "response": {
+    "modId": "101",
+    "modDesc": "Sample"
+  }
+}

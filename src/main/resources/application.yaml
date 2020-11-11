@@ -1,0 +1,34 @@
+##Application Name to appear in Azure App Insights
+spring:
+  application:
+    name: service-kotlin-template
+server:
+  port: 8098
+  application:
+    name: service-kotlin-template
+##Properties for Prometheus End Points
+endpoints:
+  prometheus:
+    enabled: true
+management:
+  endpoints:
+    web:
+      base-path: "/servicetemplate/api/v1/service-template"
+      exposure:
+        include: "*"
+##OpenAPI To Enable
+springdoc:
+  swagger-ui.path: "/servicetemplate/api/v1/service-template/swagger-ui-custom.html"
+  api-docs.path: "/servicetemplate/api/v1/store-cluster-service/api-docs"
+##Azure Cosmos Credentials and App Insights Key
+azure:
+  cosmosdb:
+    database: offerplanning-db
+    key: 25QGKcgBnsdHHUkDf8uZuLqVsaJmdg9CSFUKzCicLZN8h33IuQRdDkRJCMS2EuqU6ruec4HaCowzAYtlYZHgqg==
+    uri: https://offerplanning-cosmos-db.documents.azure.com:443/
+  application-insights:
+    instrumentation-key: f0807cb4-14fe-437c-ab41-6ed885735d2b
+
+service:
+  perf-urls:
+    get-model-url: "http://localhost:8097/servicetemplate/api/v1/getModel"

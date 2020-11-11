@@ -1,0 +1,65 @@
+trigger:
+ branches:
+   include:
+     - master
+     - feature/*
+ paths:
+   exclude:
+     - README.md
+
+#put your variabe names
+variables:
+  technology: 'springboot'
+  sonaranalysis: 'true'
+  application: 'kotlin-service-template'
+  istiokey: 'kotlinservice'
+  servicereleasename: 'kotlin-service-template-service'
+  v1deployreleasename: 'kotlin-service-template-v1'
+  v2deployreleasename: 'kotlin-service-template-v2'
+  deploy: 'true'
+  canary: 'true'
+  weightv2: 0
+  weightv1: 100
+  test: 'false'
+resources:
+  repositories:
+    - repository: Templates
+      type: git
+      name: Templates
+    - repository: commerce-mvp-helm-istio-canary
+      type: git
+      name: commerce-mvp-helm-istio-canary
+stages:
+- stage: springbootbuild
+  displayName: springbootbuild
+  jobs:
+   - template: springbootbuild.yaml@Templates
+  condition: eq('${{ variables.technology }}', 'springboot')
+- stage: PreBuildApprovalStage
+  displayName: PreBuildApprovalStage
+  jobs: 
+  - deployment: MyDeployment
+    displayName: MyDeployment
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    environment: 'Production'
+    strategy:
+     runOnce:
+      deploy:
+         steps:
+         - bash: |
+            echo This is approval stage
+- stage: deploy
+  displayName: deploy
+  dependsOn:
+     - PreBuildApprovalStage
+  jobs:
+     - template: deployusinghelmchart.yml@commerce-mvp-helm-istio-canary
+  condition: and(succeeded('springbootbuild') , eq('${{ variables.deploy }}', 'true'))
+- stage: Test
+  displayName: Test
+  dependsOn:
+    - deploy
+  jobs:
+     - template: PostDeploymentTests.yaml@Templates
+  condition: and(succeeded('deploy') , eq('${{ variables.test }}', 'true'))   
